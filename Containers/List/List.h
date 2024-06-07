@@ -8,23 +8,25 @@
 namespace mystl
 {
     template<typename T>
-    class SingleLinkedList
+    class List
     {
         class Node
         {
             private:
                 T val;
                 Node* next;
+                Node* prev;
             public:
                 Node();
                 Node(const T&);
                 ~Node();
-            friend class SingleLinkedList;
+            friend class List;
         };
         private:
             Node* head;
+            Node* tail;
         public:
-            SingleLinkedList();
+            List();
             void push_back(const T&);
             void pop_back();
             void push_front(const T&);
@@ -34,90 +36,98 @@ namespace mystl
             void createLoop(int);
             bool hasLoop() const;
             void reverseList();
-            T findElem(int) const;
-            ~SingleLinkedList();
+            T findNthlastElem(int) const;
+            ~List();
     };
 }
 
 template<typename T>
-mystl::SingleLinkedList<T>::Node::Node() : val(T()) , next(nullptr)
+mystl::List<T>::Node::Node() : val(T()) , next(nullptr) , prev(nullptr)
 {
 
 }
 
 template<typename T>
-mystl::SingleLinkedList<T>::Node::Node(const T& val) : val(val) , next(nullptr)
+mystl::List<T>::Node::Node(const T& val) : val(val) , next(nullptr) , prev(nullptr)
 {
 
 }
 
 template<typename T>
-mystl::SingleLinkedList<T>::Node::~Node()
+mystl::List<T>::Node::~Node()
 {
 
 }
 
 template<typename T>
-mystl::SingleLinkedList<T>::SingleLinkedList() : head(nullptr)
+mystl::List<T>::List() : head(nullptr) , tail(nullptr)
 {
 
 }
 
 template<typename T>
-void mystl::SingleLinkedList<T>::push_back(const T& val)
+void mystl::List<T>::push_back(const T& val)
+{
+    Node* ptr = new Node(val);
+    if(tail == nullptr)
+    {
+        head = ptr;
+        tail = ptr;
+    }
+    else
+    {
+        tail -> next = ptr;
+        ptr -> prev = tail;
+        ptr -> next = nullptr;
+        tail = ptr;
+    }
+}
+
+template<typename T>
+void mystl::List<T>::pop_back()
+{
+    if(tail == nullptr)
+    {
+        throw std::runtime_error("List is empty. Cannot pop from an empty list.");
+    }
+    else
+    {
+        if(head == tail)
+        {
+            delete tail;
+            head = nullptr;
+            tail = nullptr;
+        }
+        else
+        {
+            Node* tmp = tail;
+            tail = tail -> prev;
+            tail -> next = nullptr;
+            delete tmp;
+        }
+    }
+}
+
+template<typename T>
+void mystl::List<T>::push_front(const T& val)
 {
     Node* ptr = new Node(val);
     if(head == nullptr)
     {
         head = ptr;
+        tail = ptr;
     }
     else
     {
-        Node* tmp = head;
-        while(tmp -> next != nullptr)
-        {
-            tmp = tmp -> next; 
-        }
-        tmp -> next = ptr; 
+        head -> prev = ptr;
+        ptr -> next = head;
+        ptr -> prev = nullptr;
+        head = ptr;
     }
 }
 
 template<typename T>
-void mystl::SingleLinkedList<T>::pop_back()
-{
-    if(head == nullptr)
-    {
-        throw std::runtime_error("List is empty. Cannot pop from an empty list.");
-    }
-    else if(head -> next == nullptr)
-    {
-        delete head;
-        head = nullptr;
-    }
-    else
-    {
-        Node* tmp = head;
-        Node* tmp1 = nullptr;
-        while(tmp -> next != nullptr)
-        {
-            tmp1 = tmp;
-            tmp = tmp -> next; 
-        }
-        tmp1 -> next = nullptr;
-        delete tmp;
-    }
-}
-
-template<typename T>
-void mystl::SingleLinkedList<T>::push_front(const T& val)
-{
-    Node* ptr = new Node(val);
-    ptr -> next = head;
-    head = ptr;
-}
-
-template<typename T>
-void mystl::SingleLinkedList<T>::pop_front()
+void mystl::List<T>::pop_front()
 {
     if(head == nullptr)
     {
@@ -125,14 +135,24 @@ void mystl::SingleLinkedList<T>::pop_front()
     }
     else
     {
-        Node* tmp = head;
-        head = head -> next;
-        delete tmp;
+        if(head == tail)
+        {
+            delete tail;
+            head = nullptr;
+            tail = nullptr;
+        }
+        else
+        {
+            Node* tmp = head;
+            head = head -> next;
+            head -> prev = nullptr;
+            delete tmp;
+        }
     }
 }
 
 template<typename T>
-void mystl::SingleLinkedList<T>::insert(int pos, const T& val)
+void mystl::List<T>::insert(int pos, const T& val)
 {
     if(pos < 0)
     {
@@ -144,24 +164,33 @@ void mystl::SingleLinkedList<T>::insert(int pos, const T& val)
         push_front(val);
         return;
     }
-    Node* tmp = head;
-    Node* tmp1 = nullptr;
+    Node* tmp1 = head;
+    Node* tmp0 = nullptr;
     for(int i = 0 ; i < pos ; i++)
     {
-        if(tmp == nullptr)
+        if(tmp1 == nullptr)
         {
             throw std::runtime_error("List is smaller. Can't do insertion");
         }
-        tmp1 = tmp;
-        tmp = tmp -> next;
+        tmp0 = tmp1;
+        tmp1 = tmp1 -> next;
     }
-    tmp1 -> next = ptr;
-    ptr -> next = tmp;
+    if(tmp0 == tail)
+    {
+        push_back(val);
+    }
+    else
+    {
+        tmp1 -> prev = ptr;
+        ptr -> next = tmp1;
+        tmp0 -> next = ptr;
+        ptr -> prev = tmp0;
+    }
     return;
 }
 
 template<typename T>
-void mystl::SingleLinkedList<T>::print() const
+void mystl::List<T>::print() const
 {
     std::vector<Node*> printed;
     Node* tmp = head;
@@ -191,20 +220,19 @@ void mystl::SingleLinkedList<T>::print() const
 }
 
 template<typename T>
-void  mystl::SingleLinkedList<T>::createLoop(int pos)
+void  mystl::List<T>::createLoop(int pos)
 {
     int ind = -1;
     Node* ptr = nullptr;
     Node* tmp = head;
-    Node* tmp1 = nullptr;
     while(tmp != nullptr)
     {
         ind++;
         if(ind == pos)
         {
             ptr = tmp;
+            break;
         }
-        tmp1 = tmp;
         tmp = tmp -> next;
     }
     if(ptr == nullptr)
@@ -212,12 +240,13 @@ void  mystl::SingleLinkedList<T>::createLoop(int pos)
         std::cout << "Couldn't create cycle" << std::endl;
         return;
     }
-    tmp1 -> next = ptr;
+    tail -> next = ptr;
+    ptr -> prev = tail;
     return;
 }
 
 template<typename T>
-bool mystl::SingleLinkedList<T>::hasLoop() const
+bool mystl::List<T>::hasLoop() const
 {
     Node* ptr1 = head;
     Node* ptr2 = head;
@@ -234,51 +263,41 @@ bool mystl::SingleLinkedList<T>::hasLoop() const
 }
 
 template<typename T>
-void mystl::SingleLinkedList<T>::reverseList()
+void mystl::List<T>::reverseList()
 {
-    Node* tmp = head;
-    std::vector<Node*> nodes;
-    while(tmp != nullptr)
+    if(head != tail)
     {
-        nodes.push_back(tmp);
-        tmp = tmp -> next;
+        Node* tmp = head;
+        head = tail;
+        Node* first = head;
+        while(first != nullptr)
+        {
+            std::swap(first -> prev , first -> next);
+            first = first -> next;
+        }
+        tail = tmp;
     }
-    head = nodes.back();
-    tmp = head;
-    for(int i = nodes.size() - 2 ; i >= 0 ; i--)
-    {   
-        tmp -> next = nodes[i];
-        tmp = tmp -> next;
-    }
-    tmp -> next = nullptr;
-    nodes.clear();
     return;
 }
 
 template<typename T>
-T mystl::SingleLinkedList<T>::findElem(int n) const
+T mystl::List<T>::findNthlastElem(int n) const
 {
-    Node* tmp1 = head;
-    Node* tmp2 = head;
-    for(int i = 0 ; i <= n ; i++)
+    Node* tmp = tail;
+    for(int i = 0 ; i < n ; i++)
     {
-        if(tmp2 == nullptr)
+        if(tmp == nullptr)
         {
-            std::cout << "List size is smaller than the element" << std::endl;
+            std::cout << "List size is smaller than the element";
             return T();
         }
-        tmp2 = tmp2 -> next;
+        tmp = tmp -> prev;
     }
-    while(tmp2 != nullptr)
-    {
-        tmp1 = tmp1 -> next;
-        tmp2 = tmp2 -> next;
-    }
-    return tmp1 -> val;
+    return tmp -> val;
 }
 
 template<typename T>
-mystl::SingleLinkedList<T>::~SingleLinkedList()
+mystl::List<T>::~List()
 {
     std::vector<Node*> deleted;
     while(head != nullptr)
