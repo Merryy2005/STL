@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-
+#include "C:/STL/Iterators/Input_Iterator.h"
 
 namespace mystl
 {
@@ -19,8 +19,10 @@ namespace mystl
             public:
                 Node();
                 Node(const T&);
+                T getValue() const;
                 ~Node();
             friend class List;
+            friend class mystl::InputIterator<Node>;
         };
         private:
             Node* head;
@@ -37,6 +39,8 @@ namespace mystl
             bool hasLoop() const;
             void reverseList();
             T findNthlastElem(int) const;
+            InputIterator<Node> begin() const;
+            InputIterator<Node> end() const;
             ~List();
     };
 }
@@ -51,6 +55,12 @@ template<typename T>
 mystl::List<T>::Node::Node(const T& val) : val(val) , next(nullptr) , prev(nullptr)
 {
 
+}
+
+template<typename T>
+T mystl::List<T>::Node::getValue() const
+{
+    return val;
 }
 
 template<typename T>
@@ -294,6 +304,18 @@ T mystl::List<T>::findNthlastElem(int n) const
         tmp = tmp -> prev;
     }
     return tmp -> val;
+}
+
+template<typename T>
+mystl::InputIterator<typename mystl::List<T>::Node> mystl::List<T>::begin() const
+{
+    return mystl::InputIterator<typename mystl::List<T>::Node>(head);
+}
+
+template<typename T>
+mystl::InputIterator<typename mystl::List<T>::Node> mystl::List<T>::end() const
+{
+    return mystl::InputIterator<typename mystl::List<T>::Node>(nullptr);
 }
 
 template<typename T>
