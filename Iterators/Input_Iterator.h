@@ -21,7 +21,7 @@ namespace mystl
             InputIterator(typename mystl::List<T>::Node*);
             InputIterator(const InputIterator&);
             T& operator*() const;
-            T* operator->() const;
+            InputIterator* operator->() const;
             InputIterator& operator=(const InputIterator&);
             InputIterator& operator++();
             InputIterator operator++(int);
@@ -52,9 +52,9 @@ T& mystl::InputIterator<T>::operator*() const
 }
 
 template<typename T>
-T* mystl::InputIterator<T>::operator->() const
+mystl::InputIterator<T>* mystl::InputIterator<T>::operator->() const
 {
-    return &(m_ptr->val);
+    return m_ptr;
 }
 
 template<typename T>

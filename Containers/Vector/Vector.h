@@ -52,12 +52,9 @@ mystl::vector<T>::vector() : m_size(0) , m_cap(1) , m_arr(new T[m_cap])
 }
 
 template <typename T>
-mystl::vector<T>::vector(int size) : m_size(size) , m_cap(2*size) , m_arr(new T[2*size])
+mystl::vector<T>::vector(int cap) : m_size(0) , m_cap(cap > 0 ? cap : 1) , m_arr(new T[cap])
 {
-    for(int i = 0 ; i < m_size ; i++)
-    {
-        m_arr[i] = T();
-    }
+
 }
 
 template <typename T>
