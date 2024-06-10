@@ -7,6 +7,7 @@
 
 namespace mystl
 {
+    template<typename T> class InputIterator; 
     template<typename T>
     class List
     {
@@ -19,10 +20,9 @@ namespace mystl
             public:
                 Node();
                 Node(const T&);
-                T getValue() const;
                 ~Node();
             friend class List;
-            friend class mystl::InputIterator<Node>;
+            friend class mystl::InputIterator<T>;
         };
         private:
             Node* head;
@@ -39,9 +39,10 @@ namespace mystl
             bool hasLoop() const;
             void reverseList();
             T findNthlastElem(int) const;
-            InputIterator<Node> begin() const;
-            InputIterator<Node> end() const;
+            InputIterator<T> begin() const;
+            InputIterator<T> end() const;
             ~List();
+        friend class mystl::InputIterator<T>;
     };
 }
 
@@ -55,12 +56,6 @@ template<typename T>
 mystl::List<T>::Node::Node(const T& val) : val(val) , next(nullptr) , prev(nullptr)
 {
 
-}
-
-template<typename T>
-T mystl::List<T>::Node::getValue() const
-{
-    return val;
 }
 
 template<typename T>
@@ -307,15 +302,15 @@ T mystl::List<T>::findNthlastElem(int n) const
 }
 
 template<typename T>
-mystl::InputIterator<typename mystl::List<T>::Node> mystl::List<T>::begin() const
+mystl::InputIterator<T> mystl::List<T>::begin() const
 {
-    return mystl::InputIterator<typename mystl::List<T>::Node>(head);
+    return mystl::InputIterator<T>(head);
 }
 
 template<typename T>
-mystl::InputIterator<typename mystl::List<T>::Node> mystl::List<T>::end() const
+mystl::InputIterator<T> mystl::List<T>::end() const
 {
-    return mystl::InputIterator<typename mystl::List<T>::Node>(nullptr);
+    return mystl::InputIterator<T>(nullptr);
 }
 
 template<typename T>

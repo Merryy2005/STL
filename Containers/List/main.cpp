@@ -1,4 +1,4 @@
-#include "List.h"
+#include "C:/STL/Containers/List/List.h"
 #include "C:/STL/Iterators/Input_Iterator.h"
 
 template<typename Iterator>
@@ -6,7 +6,7 @@ void print(Iterator begin , Iterator end)
 {
     for(Iterator it = begin ; it != end ; ++it)
     {
-        std::cout << it->getValue() << " ";
+        std::cout << *it << " ";
     }
     std::cout << std::endl;
     return;
