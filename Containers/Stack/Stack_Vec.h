@@ -1,15 +1,14 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef STACK_H
+#define STACK_H
 
 #include <iostream>
-#include <initializer_list>
 
 namespace mystl
 {
     template<typename T>
     class vector
     {
-        private:
+        protected:
             int m_size;
             int m_cap;
             T* m_arr;
@@ -30,20 +29,25 @@ namespace mystl
             void push_front(T);
             void pop_front();
             void insert(int , T);
-            template <typename U>
-            friend std::ostream& operator<< (std::ostream& , const vector<U>&);
+            void print() const;
             ~vector();
     };
-    template <typename U>
-    std::ostream& operator<< (std::ostream& os, const vector<U>& vec)
+    template<typename T>
+    class stack : private vector<T>
     {
-        for(int i = 0 ; i < vec.m_size ; i++)
-        {
-            os << vec.m_arr[i] << " ";
-        }
-        os << std::endl;
-        return os;
-    }
+        public:
+            stack();
+            stack(int);
+            stack(const stack&);
+            stack& operator= (const stack&);
+            T top() const;
+            bool empty() const;
+            int size() const;
+            void push(T);
+            void pop();
+            void print() const;
+            ~stack();
+    };
 }
 
 template <typename T>
@@ -245,9 +249,97 @@ void mystl::vector<T>::insert(int pos , T val)
 }
 
 template <typename T>
+void mystl::vector<T>::print() const
+{
+    for (int i = 0; i < m_size; i++)
+    {
+        std::cout << m_arr[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+template <typename T>
 mystl::vector<T>::~vector()
 {
     delete[] m_arr;
 }
 
-#endif //VECTOR_H
+template <typename T>
+mystl::stack<T>::stack() : vector<T>()
+{
+
+}
+
+template <typename T>
+mystl::stack<T>::stack(int cap) : vector<T>(cap)
+{
+
+} 
+
+template <typename T>
+mystl::stack<T>::stack(const stack& other) : vector<T>(other)
+{
+
+}
+
+template <typename T>
+mystl::stack<T>& mystl::stack<T>::operator= (const mystl::stack<T>& other)
+{
+    if(this != &other)
+    {
+        vector<T>::operator=(other);
+    }
+    return *this;
+}
+
+template <typename T>
+T mystl::stack<T>::top() const
+{
+    if (this->m_size == 0)
+    {
+        std::cout << "Stack is empty, can't call top" << std::endl;
+        return T();
+    }
+    else
+    {
+        return this->m_arr[this->m_size - 1];
+    }
+}
+
+template <typename T>
+bool mystl::stack<T>::empty() const
+{
+    return vector<T>::empty();
+}
+
+template <typename T>
+int mystl::stack<T>::size() const
+{
+    return vector<T>::size();
+}
+
+template <typename T>
+void mystl::stack<T>::push(T val)
+{
+    vector<T>::push_back(val);
+}
+
+template <typename T>
+void mystl::stack<T>::pop()
+{
+    vector<T>::pop_back();
+}
+
+template <typename T>
+void mystl::stack<T>::print() const
+{
+    vector<T>::print();
+}
+
+template <typename T>
+mystl::stack<T>::~stack()
+{
+
+}
+
+#endif // STACK_H

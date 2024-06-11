@@ -40,7 +40,6 @@
         "limits": "cpp",
         "new": "cpp",
         "stdexcept": "cpp",
-        "typeinfo": "cpp",
-        "list": "cpp"
+        "typeinfo": "cpp"
     }
 }
