@@ -25,6 +25,8 @@ namespace mystl
             T& operator[](int);
             int size() const;
             bool empty() const;
+            void resize(int);
+            void reserve(int);
             void push_back(T);
             void pop_back();
             void push_front(T);
@@ -53,9 +55,12 @@ mystl::vector<T>::vector() : m_size(0) , m_cap(1) , m_arr(new T[m_cap])
 }
 
 template <typename T>
-mystl::vector<T>::vector(int size) : m_size(size) , m_cap(size > 0 ? 2 * size : 1) , m_arr(new T[m_cap])
+mystl::vector<T>::vector(int size) : m_size(size), m_cap(size > 0 ? 2 * size : 1), m_arr(new T[m_cap])
 {
-    
+    for(int i = 0 ; i < m_size ; i++)
+    {
+        m_arr[i] = T();
+    }
 }
 
 template <typename T>
@@ -148,6 +153,62 @@ template <typename T>
 bool mystl::vector<T>::empty() const
 {
     return m_size == 0;
+}
+
+template <typename T>
+void mystl::vector<T>::resize(int size)
+{
+    if(size < 0)
+    {
+        std::cout << "Can't do resize" << std::endl;
+        return;
+    }
+    if(m_size >= size)
+    {
+        m_size = size;
+    }
+    else
+    {
+        if(m_cap < size)
+        {
+            m_cap = 2*size;
+            T* temp = new T[m_cap];
+            for(int i = 0 ; i < m_size; i++)
+            {
+                temp[i] = m_arr[i];
+            }
+            delete[] m_arr;
+            m_arr = temp;
+        }
+        m_size = size;
+    }
+}
+
+
+template <typename T>
+void mystl::vector<T>::reserve(int cap)
+{
+    if(cap < 0)
+    {
+        std::cout << "Can't do reserve" << std::endl;
+        return;
+    }
+    if(m_cap < cap)
+    {
+        m_cap = cap;
+        T* temp = static_cast<T*>(operator new(m_cap * sizeof(T))); // that didn't call constructors
+        if(temp == nullptr)
+        {
+            std::cout << "Can't do reserve" << std::endl;
+            return;
+        }
+        for(int i = 0 ; i < m_size; i++)
+        {
+            temp[i] = m_arr[i];
+        }
+        delete[] m_arr;
+        m_arr = temp;  
+    }
 }
 
 template <typename T>

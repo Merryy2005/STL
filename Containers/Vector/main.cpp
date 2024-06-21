@@ -5,6 +5,12 @@ int main()
 {
     mystl::vector<int> v(10);
     std::cout << v;
+    std::cout << "v.size() = " << v.size() << std::endl;
+    v.reserve(20);
+    std::cout << "v.size() = " << v.size() << std::endl;
+    v.resize(20);
+    std::cout << "v.size() = " << v.size() << std::endl;
+    std::cout << v;
     v.push_back(5);
     v.push_back(5);
     v.push_back(5);
