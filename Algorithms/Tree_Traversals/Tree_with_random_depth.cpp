@@ -35,9 +35,9 @@ class Tree
             Node<int>* temp = q.front();
             std::cout << temp->val << std::endl;
             q.pop();
-            for(Node<int>* in : temp->children)
+            for(Node<int>* child : temp->children)
             {
-                q.push(in);
+                q.push(child);
             }
         }
     }
