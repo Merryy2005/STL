@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <initializer_list>
+#include "C:\STL\Containers\Exception.hpp"
 
 namespace mystl
 {
@@ -24,6 +25,7 @@ namespace mystl
             T operator[](int) const;
             T& operator[](int);
             int size() const;
+            T at(int) const;
             bool empty() const;
             void resize(int);
             void reserve(int);
@@ -126,20 +128,12 @@ mystl::vector<T>& mystl::vector<T>::operator= (mystl::vector<T>&& other)
 template <typename T>
 T mystl::vector<T>::operator[](int ind) const
 {
-    if(ind < 0 || ind >= m_size)
-    {
-        throw std::out_of_range("This index is not valid.");
-    }
     return m_arr[ind];
 }
 
 template <typename T>
 T& mystl::vector<T>::operator[](int ind)
 {
-    if(ind < 0 || ind >= m_size)
-    {
-        throw std::out_of_range("This index is not valid.");
-    }
     return m_arr[ind];
 }
 
@@ -147,6 +141,16 @@ template <typename T>
 int mystl::vector<T>::size() const
 {
     return m_size;
+}
+
+template <typename T>
+T mystl::vector<T>::at(int ind) const
+{
+    if(ind < 0 || ind >= m_size)
+    {
+        throw mystl::my_exception("out of range");
+    }
+    return m_arr[ind];
 }
 
 template <typename T>

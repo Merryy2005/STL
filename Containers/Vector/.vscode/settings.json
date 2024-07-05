@@ -41,6 +41,9 @@
         "new": "cpp",
         "stdexcept": "cpp",
         "typeinfo": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "ctime": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     }
 }
