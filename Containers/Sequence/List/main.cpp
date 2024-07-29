@@ -1,4 +1,4 @@
-#include "C:/STL/Containers/List/List.h"
+#include "List.hpp"
 #include "C:/STL/Iterators/Input_Iterator.h"
 
 template<typename Iterator>
@@ -39,13 +39,15 @@ int main()
     print(list.begin() , list.end());
     list.insert(8 , 20);
     print(list.begin() , list.end());
+    list.erase(3);
+    print(list.begin() , list.end());
     std::cout << (list.hasLoop() ? "List has loop" : "List doesn't have loop")<< std::endl;
     list.reverseList();
     std::cout << "Reversed List : " << std::endl;
     print(list.begin() , list.end());
-    // std::cout << list.findNthlastElem(3) << std::endl;
-    // list.createLoop(2);
-    // print(list.begin() , list.end());
-    // std::cout << (list.hasLoop() ? "List has loop" : "List doesn't have loop") << std::endl;
+    std::cout << list.findNthlastElem(3) << std::endl;
+    list.createLoop(2);
+    list.print();
+    std::cout << (list.hasLoop() ? "List has loop" : "List doesn't have loop") << std::endl;
     return 0;
 }

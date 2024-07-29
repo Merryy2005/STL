@@ -1,7 +1,7 @@
-#include "Single_linked_list.h"
+#include "ForwardList.hpp"
 int main()
 {
-    mystl::SingleLinkedList<int> list;
+    mystl::ForwardList<int> list;
     list.print();
     list.push_back(1);
     list.push_back(2);
@@ -18,11 +18,14 @@ int main()
     list.print();
     list.insert(2 , 8);
     list.print();
+    list.erase(3);
+    list.print();
+    std::cout << list.size() << std::endl;
     std::cout << (list.hasLoop() ? "List has loop" : "List doesn't have loop")<< std::endl;
     list.reverseList();
     std::cout << "Reversed List : " << std::endl;
     list.print();
-    std::cout << list.findElem(3) << std::endl;
+    std::cout << list.findNthlastElem(2) << std::endl;
     list.createLoop(2);
     list.print();
     std::cout << (list.hasLoop() ? "List has loop" : "List doesn't have loop") << std::endl;
