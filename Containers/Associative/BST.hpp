@@ -25,6 +25,7 @@ namespace mystl
             mystl::Vector<Value> value;
             Node* left;
             Node* right;
+            Container cType;
             Node(const Key& , const Value& , Container);
         friend class BST<Key, Value>;
     };
@@ -54,7 +55,7 @@ namespace mystl
 }
 
 template<typename Key, typename Value>
-mystl::Node<Key, Value>::Node(const Key& k, const Value& v, mystl::Container c) : key(k), value(), left(nullptr), right(nullptr) 
+mystl::Node<Key, Value>::Node(const Key& k, const Value& v, mystl::Container c) : key(k), value(), left(nullptr), right(nullptr) , cType(c) 
 {
     value = mystl::Vector<Value>{v};
 }

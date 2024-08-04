@@ -8,23 +8,27 @@
 namespace mystl
 {
     template<typename T>
+    class ForwardList;
+
+    template<typename T>
+    class ListNode
+    {
+        public:
+            T val;
+            ListNode* next;
+        public:
+            ListNode();
+            ListNode(const T&);
+            T& operator*();
+            const T& operator*() const;
+            ~ListNode();
+        friend class mystl::ForwardList<T>;
+    };
+    template<typename T>
     class ForwardList
     {
-        class Node
-        {
-            private:
-                T val;
-                Node* next;
-            public:
-                Node();
-                Node(const T&);
-                T& operator*();
-                const T& operator*() const;
-                ~Node();
-            friend class ForwardList;
-        };
         private:
-            Node* head;
+            mystl::ListNode<T>* head;
         public:
             ForwardList();
             ForwardList(const ForwardList&);
@@ -33,17 +37,18 @@ namespace mystl
             ForwardList& operator=(ForwardList&&);
             T& front();
             const T& front() const;
-            Node* begin() noexcept;
-            const Node* begin() const noexcept;
-            const Node* cbegin() const noexcept;
-            Node* end() noexcept;
-            const Node* end() const noexcept;
-            const Node* cend() const noexcept;
+            ListNode<T>* begin() noexcept;
+            const ListNode<T>* begin() const noexcept;
+            ListNode<T>* end() noexcept;
+            const ListNode<T>* end() const noexcept;
             bool empty() const noexcept;
             void clear() noexcept;
             std::size_t size() const;
             void insert(std::size_t , const T&);
             void erase(std::size_t);
+            mystl::ListNode<T>* erase(ListNode<T>* node);
+            void remove(const T& value); 
+            void removeIf(bool (*pred)(const T&)); 
             void push_back(const T&);
             void pop_back();
             void push_front(const T&);
@@ -58,31 +63,31 @@ namespace mystl
 }
 
 template<typename T>
-mystl::ForwardList<T>::Node::Node() : val(T()) , next(nullptr)
+mystl::ListNode<T>::ListNode() : val(T()) , next(nullptr)
 {
 
 }
 
 template<typename T>
-mystl::ForwardList<T>::Node::Node(const T& val) : val(val) , next(nullptr)
+mystl::ListNode<T>::ListNode(const T& val) : val(val) , next(nullptr)
 {
 
 }
 
 template<typename T>
-T& mystl::ForwardList<T>::Node::operator*()
-{
-    return val;
-}
-
-template<typename T>
-const T& mystl::ForwardList<T>::Node::operator*() const
+T& mystl::ListNode<T>::operator*()
 {
     return val;
 }
 
 template<typename T>
-mystl::ForwardList<T>::Node::~Node()
+const T& mystl::ListNode<T>::operator*() const
+{
+    return val;
+}
+
+template<typename T>
+mystl::ListNode<T>::~ListNode()
 {
 
 }
@@ -96,7 +101,7 @@ mystl::ForwardList<T>::ForwardList() : head(nullptr)
 template<typename T>
 mystl::ForwardList<T>::ForwardList(const ForwardList<T>& other) : head(nullptr)
 {
-    Node* cur = other.head;
+    mystl::ListNode<T>* cur = other.head;
     while (cur) 
     {
         push_back(cur->val);
@@ -116,7 +121,7 @@ mystl::ForwardList<T>& mystl::ForwardList<T>::operator=(const ForwardList<T>& ot
     if(this != &other)
     {
         clear();
-        Node* cur = other.head;
+        mystl::ListNode<T>* cur = other.head;
         while (cur) 
         {
             push_back(cur->val);
@@ -159,37 +164,25 @@ const T& mystl::ForwardList<T>::front() const
 }
 
 template<typename T>
-typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::begin() noexcept
+typename mystl::ListNode<T>* mystl::ForwardList<T>::begin() noexcept
 {
     return head;
 }
 
 template<typename T>
-const typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::begin() const noexcept
+const typename mystl::ListNode<T>* mystl::ForwardList<T>::begin() const noexcept
 {
     return head;
 }
 
 template<typename T>
-const typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::cbegin() const noexcept
-{
-    return head;
-}
-
-template<typename T>
-typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::end() noexcept
+typename mystl::ListNode<T>* mystl::ForwardList<T>::end() noexcept
 {
     return nullptr;
 }
 
 template<typename T>
-const typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::end() const noexcept
-{
-    return nullptr;
-}
-
-template<typename T>
-const typename mystl::ForwardList<T>::Node* mystl::ForwardList<T>::cend() const noexcept
+const typename mystl::ListNode<T>* mystl::ForwardList<T>::end() const noexcept
 {
     return nullptr;
 }
@@ -203,10 +196,10 @@ bool mystl::ForwardList<T>::empty() const noexcept
 template<typename T>
 void mystl::ForwardList<T>::clear() noexcept
 {
-    mystl::Vector<Node*> deleted;
+    mystl::Vector<mystl::ListNode<T>*> deleted;
     while(head != nullptr)
     {
-        Node* tmp = head;
+        mystl::ListNode<T>* tmp = head;
         bool isDeleted = false;
         for(std::size_t i = 0 ; i < deleted.size() ; i++)
         {
@@ -234,7 +227,7 @@ void mystl::ForwardList<T>::clear() noexcept
 template<typename T>
 std::size_t mystl::ForwardList<T>::size() const
 {
-    Node* tmp = head;
+    mystl::ListNode<T>* tmp = head;
     std::size_t s = 0;
     while(tmp != nullptr)
     {
@@ -252,10 +245,10 @@ void mystl::ForwardList<T>::insert(std::size_t pos , const T& val)
         push_front(val);
         return;
     }
-    Node* ptr = new Node(val);
+    mystl::ListNode<T>* ptr = new mystl::ListNode<T>(val);
     std::size_t ind = 0;
-    Node* tmp = head;
-    Node* tmp1 = nullptr;
+    mystl::ListNode<T>* tmp = head;
+    mystl::ListNode<T>* tmp1 = nullptr;
     while(tmp != nullptr && ind < pos)
     {
         ind++;
@@ -283,8 +276,8 @@ void mystl::ForwardList<T>::erase(std::size_t pos)
         return;
     }
     std::size_t ind = 0;
-    Node* tmp = head;
-    Node* tmp1 = nullptr;
+    mystl::ListNode<T>* tmp = head;
+    mystl::ListNode<T>* tmp1 = nullptr;
     while(tmp != nullptr && ind < pos)
     {
         ind++;
@@ -304,16 +297,98 @@ void mystl::ForwardList<T>::erase(std::size_t pos)
 }
 
 template<typename T>
+mystl::ListNode<T>* mystl::ForwardList<T>::erase(mystl::ListNode<T>* node)
+{
+    if (head == nullptr)
+    {
+        throw std::runtime_error("List is empty. Cannot erase from an empty list.");
+    }
+    if (head == node)
+    {
+        head = head->next;
+        mystl::ListNode<T>* nextNode = head;  
+        delete node;
+        return nextNode;
+    }
+    mystl::ListNode<T>* current = head;
+    while (current != nullptr && current->next != node)
+    {
+        current = current->next;
+    }
+    if (current != nullptr)
+    {
+        mystl::ListNode<T>* nextNode = node->next; 
+        current->next = nextNode;
+        delete node;
+        return nextNode;
+    }
+    else
+    {
+        throw std::out_of_range("Node not found in the list.");
+    }
+}
+
+template<typename T>
+void mystl::ForwardList<T>::remove(const T& value) 
+{
+    while (head && head->val == value) 
+    {
+        mystl::ListNode<T>* tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+    mystl::ListNode<T>* current = head;
+    while (current && current->next) 
+    {
+        if (current->next->val == value) 
+        {
+            mystl::ListNode<T>* tmp = current->next;
+            current->next = current->next->next;
+            delete tmp;
+        } 
+        else 
+        {
+            current = current->next;
+        }
+    }
+}
+
+template<typename T>
+void mystl::ForwardList<T>::removeIf(bool (*pred)(const T&)) 
+{
+    while (head && pred(head->val)) 
+    {
+        mystl::ListNode<T>* tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+    mystl::ListNode<T>* current = head;
+    while (current && current->next) 
+    {
+        if (pred(current->next->val)) 
+        {
+            mystl::ListNode<T>* tmp = current->next;
+            current->next = current->next->next;
+            delete tmp;
+        } 
+        else 
+        {
+            current = current->next;
+        }
+    }
+}
+
+template<typename T>
 void mystl::ForwardList<T>::push_back(const T& val)
 {
-    Node* ptr = new Node(val);
+    mystl::ListNode<T>* ptr = new mystl::ListNode<T>(val);
     if(head == nullptr)
     {
         head = ptr;
     }
     else
     {
-        Node* tmp = head;
+        mystl::ListNode<T>* tmp = head;
         while(tmp -> next != nullptr)
         {
             tmp = tmp -> next; 
@@ -337,8 +412,8 @@ void mystl::ForwardList<T>::pop_back()
     }
     else
     {
-        Node* tmp = head;
-        Node* tmp1 = nullptr;
+        mystl::ListNode<T>* tmp = head;
+        mystl::ListNode<T>* tmp1 = nullptr;
         while(tmp -> next != nullptr)
         {
             tmp1 = tmp;
@@ -352,7 +427,7 @@ void mystl::ForwardList<T>::pop_back()
 template<typename T>
 void mystl::ForwardList<T>::push_front(const T& val)
 {
-    Node* ptr = new Node(val);
+    mystl::ListNode<T>* ptr = new mystl::ListNode<T>(val);
     ptr -> next = head;
     head = ptr;
 }
@@ -366,7 +441,7 @@ void mystl::ForwardList<T>::pop_front()
     }
     else
     {
-        Node* tmp = head;
+        mystl::ListNode<T>* tmp = head;
         head = head -> next;
         delete tmp;
     }
@@ -375,8 +450,8 @@ void mystl::ForwardList<T>::pop_front()
 template<typename T>
 void mystl::ForwardList<T>::print() const
 {
-    mystl::Vector<Node*> printed;
-    Node* tmp = head;
+    mystl::Vector<mystl::ListNode<T>*> printed;
+    mystl::ListNode<T>* tmp = head;
     while(tmp != nullptr)
     {
         std::cout << tmp -> val << " ";
@@ -406,9 +481,9 @@ template<typename T>
 void  mystl::ForwardList<T>::createLoop(std::size_t pos)
 {
     std::size_t ind = 0;
-    Node* ptr = nullptr;
-    Node* tmp = head;
-    Node* tmp1 = nullptr;
+    mystl::ListNode<T>* ptr = nullptr;
+    mystl::ListNode<T>* tmp = head;
+    mystl::ListNode<T>* tmp1 = nullptr;
     while(tmp != nullptr)
     {
         if(ind == pos)
@@ -431,8 +506,8 @@ void  mystl::ForwardList<T>::createLoop(std::size_t pos)
 template<typename T>
 bool mystl::ForwardList<T>::hasLoop() const
 {
-    Node* ptr1 = head;
-    Node* ptr2 = head;
+    mystl::ListNode<T>* ptr1 = head;
+    mystl::ListNode<T>* ptr2 = head;
     while(ptr1 && ptr2 && ptr2 -> next)
     {
         ptr1 = ptr1 -> next;
@@ -448,11 +523,11 @@ bool mystl::ForwardList<T>::hasLoop() const
 template<typename T>
 void mystl::ForwardList<T>::reverseList()
 {
-    Node* tmp = head;
-    Node* tmp1 = nullptr;
+    mystl::ListNode<T>* tmp = head;
+    mystl::ListNode<T>* tmp1 = nullptr;
     while(tmp != nullptr)
     {
-        Node* tmp2 = tmp -> next; 
+        mystl::ListNode<T>* tmp2 = tmp -> next; 
         tmp -> next = tmp1;
         tmp1 = tmp;
         tmp = tmp2;
@@ -464,8 +539,8 @@ void mystl::ForwardList<T>::reverseList()
 template<typename T>
 const T& mystl::ForwardList<T>::findNthlastElem(std::size_t n) const
 {
-    Node* tmp1 = head;
-    Node* tmp2 = head;
+    mystl::ListNode<T>* tmp1 = head;
+    mystl::ListNode<T>* tmp2 = head;
     for(std::size_t i = 0 ; i < n ; i++)
     {
         if(tmp2 == nullptr)

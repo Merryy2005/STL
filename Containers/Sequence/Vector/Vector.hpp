@@ -10,7 +10,7 @@ namespace mystl
     template<typename T>
     class Vector
     {
-        private:
+        protected:
             std::size_t m_size;
             std::size_t m_cap;
             T* m_arr;

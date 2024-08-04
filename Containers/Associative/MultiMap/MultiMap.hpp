@@ -19,6 +19,7 @@ namespace mystl
             void insert(const Key& k, const Value& v);
             void emplace(Key&& k, Value&& v);
             bool contains(const Key& k) const;
+            std::size_t count(const Key& k) const;
             void erase(const Key& k);
             void print() const;
             Node<Key, Value>* begin() const;
@@ -99,6 +100,17 @@ template<typename Key, typename Value>
 bool mystl::MultiMap<Key, Value>::contains(const Key& k) const 
 {
     return this->find(k);
+}
+
+template<typename Key, typename Value>
+std::size_t mystl::MultiMap<Key, Value>::count(const Key& k) const 
+{
+    mystl::Node<Key, Value>* node = findNode(k);
+    if (node) 
+    {
+        return node->value.size();
+    }
+    return 0;
 }
 
 template<typename Key, typename Value>
@@ -197,7 +209,7 @@ mystl::Node<Key, Value>* mystl::MultiMap<Key, Value>::copyNodes(const Node<Key, 
 template<typename Key, typename Value>
 mystl::Node<Key, Value>* mystl::MultiMap<Key, Value>::findNode(const Key& k) const 
 {
-    return this->find(this->root, k);
+    return this->find(k);
 }
 
 template<typename Key, typename Value>
