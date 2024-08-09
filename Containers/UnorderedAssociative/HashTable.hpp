@@ -86,7 +86,7 @@ mystl::HashMap<Key, Value>::HashMap(const HashMap& other)
             {
                 for (std::size_t j = 1; j < node.val.value.size(); ++j)
                 {
-                    vec[i].back().value.push_back(node.cal.value[j]);
+                    vec[i].back().value.push_back(node.val.value[j]);
                 }
             }
         }
