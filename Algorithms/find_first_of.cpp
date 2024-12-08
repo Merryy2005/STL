@@ -18,6 +18,7 @@ namespace mystl
         }
         return last;
     }
+    
     template<typename InputIt, typename ForwardIt, typename BinaryPred>
     InputIt find_first_of(InputIt first, InputIt last, ForwardIt s_first, ForwardIt s_last, BinaryPred p)
     {
